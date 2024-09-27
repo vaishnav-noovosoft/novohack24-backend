@@ -5,7 +5,9 @@ from django_filters import rest_framework as filters
 from .models import Asset, EmployeeAsset, ChangeRequest, UpdateAsset, AddAsset, ReplaceAsset
 from .serializers import (
     AssetSerializer, EmployeeAssetSerializer, ChangeRequestSerializer,
-    UpdateAssetSerializer, AddAssetSerializer, ReplaceAssetSerializer
+    UpdateAssetSerializer, AddAssetSerializer, ReplaceAssetSerializer,
+    ChangeRequestDetailsSerializer, UpdateAssetDetailsSerializer, AddAssetDetailsSerializer,
+    ReplaceAssetDetailsSerializer
 )
 
 
@@ -43,23 +45,43 @@ class EmployeeAssetViewSet(viewsets.ModelViewSet):
 
 
 class ChangeRequestViewSet(viewsets.ModelViewSet):
+    def get_serializer_class(self):
+        if self.action in ['retrieve', 'list']:
+            return ChangeRequestDetailsSerializer
+        return ChangeRequestSerializer
+
     queryset = ChangeRequest.objects.all()
-    serializer_class = ChangeRequestSerializer
+    serializer_class = get_serializer_class
 
     def create(self, request, *args, **kwargs):
         pass
 
 
 class UpdateAssetViewSet(viewsets.ModelViewSet):
+    def get_serializer_class(self):
+        if self.action in ['retrieve', 'list']:
+            return UpdateAssetDetailsSerializer
+        return UpdateAssetSerializer
+
     queryset = UpdateAsset.objects.all()
     serializer_class = UpdateAssetSerializer
 
 
 class AddAssetViewSet(viewsets.ModelViewSet):
+    def get_serializer_class(self):
+        if self.action in ['retrieve', 'list']:
+            return AddAssetDetailsSerializer
+        return AddAssetSerializer
+
     queryset = AddAsset.objects.all()
     serializer_class = AddAssetSerializer
 
 
 class ReplaceAssetViewSet(viewsets.ModelViewSet):
+    def get_serializer_class(self):
+        if self.action in ['retrieve', 'list']:
+            return ReplaceAssetDetailsSerializer
+        return ReplaceAssetSerializer
+
     queryset = ReplaceAsset.objects.all()
     serializer_class = ReplaceAssetSerializer

@@ -20,11 +20,23 @@ class ChangeRequestSerializer(serializers.ModelSerializer):
         model = ChangeRequest
         fields = ['id', 'user', 'asset', 'type', 'meta_data', 'status']
 
+class ChangeRequestDetailsSerializer(serializers.ModelSerializer):
+    asset = AssetSerializer()
+    class Meta:
+        model = ChangeRequest
+        fields = ['id', 'user', 'asset', 'type', 'meta_data', 'status']
+
 
 class UpdateAssetSerializer(serializers.ModelSerializer):
     class Meta:
         model = UpdateAsset
-        fields = ['id', 'change_request', 'asset', 'meta_data']
+        fields = '__all__'
+
+class UpdateAssetDetailsSerializer(serializers.ModelSerializer):
+    asset = AssetSerializer()
+    class Meta:
+        model = UpdateAsset
+        fields = '__all__'
 
 
 class AddAssetSerializer(serializers.ModelSerializer):
@@ -32,8 +44,21 @@ class AddAssetSerializer(serializers.ModelSerializer):
         model = AddAsset
         fields = ['id', 'asset', 'change_request', 'status']
 
+class AddAssetDetailsSerializer(serializers.ModelSerializer):
+    asset = AssetSerializer()
+    class Meta:
+        model = AddAsset
+        fields = '__all__'
+
 
 class ReplaceAssetSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReplaceAsset
         fields = ['id', 'from_asset', 'to_asset', 'meta_data', 'change_request', 'from_date', 'to_date']
+
+class ReplaceAssetDetailsSerializer(serializers.ModelSerializer):
+    from_asset = AssetSerializer()
+    to_asset = AssetSerializer()
+    class Meta:
+        model = ReplaceAsset
+        fields = '__all__'
