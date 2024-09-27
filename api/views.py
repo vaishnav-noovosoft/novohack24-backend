@@ -1,8 +1,9 @@
+from rest_framework.response import Response
 from rest_framework import viewsets
-from .models import Asset, EmployeeAsset, ChangeRequest, UpdateAsset, AddAsset, ReplaceAsset
+
+from .models import Asset, EmployeeAsset, UpdateAsset, AddAsset, ReplaceAsset, ChangeRequest
 from .serializers import (
-    AssetSerializer, EmployeeAssetSerializer, ChangeRequestSerializer,
-    UpdateAssetSerializer, AddAssetSerializer, ReplaceAssetSerializer
+    AssetSerializer, EmployeeAssetSerializer, UpdateAssetSerializer, AddAssetSerializer, ReplaceAssetSerializer,ChangeRequestSerializer
 )
 
 
@@ -18,7 +19,13 @@ class EmployeeAssetViewSet(viewsets.ModelViewSet):
 
 class ChangeRequestViewSet(viewsets.ModelViewSet):
     queryset = ChangeRequest.objects.all()
-    serializer_class = ChangeRequestSerializer
+    serializer_class = ChangeRequestSerializer  # Specify the serializer class
+
+    def list(self, request):
+        queryset = self.queryset
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 
 class UpdateAssetViewSet(viewsets.ModelViewSet):
