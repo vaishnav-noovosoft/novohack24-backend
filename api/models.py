@@ -22,7 +22,7 @@ class Asset(models.Model):
     id = models.AutoField(primary_key=True)
     type = models.CharField(max_length=3, choices=TYPE_CHOICES)
     meta_data = models.JSONField(null=True, blank=True)
-    serial_no = models.IntegerField(unique=True)
+    serial_no = models.CharField(unique=True)
 
 
 class EmployeeAsset(models.Model):
