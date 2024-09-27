@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import datetime
 from pathlib import Path
 import os
 
@@ -134,4 +134,17 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=15),  # Set the access token expiration time
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),     # Set the refresh token expiration time
+    'ROTATE_REFRESH_TOKENS': True,                   # If you want to rotate refresh tokens
+    'BLACKLIST_AFTER_ROTATION': True,                 # If you want to blacklist old refresh tokens
+    'ALGORITHM': 'HS256',                             # Set the encryption algorithm
+    'SIGNING_KEY': SECRET_KEY,                        # Use your SECRET_KEY for signing
+    'AUTH_HEADER_TYPES': ('Bearer',),                 # The type of the authorization header
+    'USER_ID_FIELD': 'id',                            # Specify the user ID field
+    'USER_ID_CLAIM': 'user_id',                       # The claim used to store the user ID
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
