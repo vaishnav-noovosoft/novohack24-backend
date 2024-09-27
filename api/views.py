@@ -103,7 +103,6 @@ class AddAssetViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.G
         add_asset_data = {
             'asset': request.data.get('asset'),
             'change_request': change_request.id,
-            'status': 'PEN'  # Set initial status as Pending
         }
         add_asset_serializer = AddAssetSerializer(data=add_asset_data)
         add_asset_serializer.is_valid(raise_exception=True)

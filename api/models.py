@@ -61,16 +61,9 @@ class UpdateAsset(models.Model):
 
 
 class AddAsset(models.Model):
-    STATUS_CHOICES = [
-        ('PEN', 'Pending'),
-        ('COM', 'Completed'),
-        ('CAN', 'Cancelled'),
-    ]
-
     id = models.AutoField(primary_key=True)
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     change_request = models.ForeignKey(ChangeRequest, on_delete=models.CASCADE)
-    status = models.CharField(max_length=3, choices=STATUS_CHOICES)
 
 
 class ReplaceAsset(models.Model):
