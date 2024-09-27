@@ -72,3 +72,15 @@ class ReplaceAssetDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReplaceAsset
         fields = '__all__'
+
+
+from rest_framework import serializers
+
+class UpdateAssetSerializer(serializers.Serializer):
+    from_asset_id = serializers.IntegerField(required=True)
+    to_asset_id = serializers.IntegerField(required=True)
+    employee_id = serializers.IntegerField(required=True)
+
+class AddAssetSerializer(serializers.Serializer):
+    asset_id = serializers.IntegerField(required=True)
+    employee_id = serializers.IntegerField(required=True)

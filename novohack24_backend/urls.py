@@ -39,16 +39,15 @@ schema_view = get_schema_view(
 )
 from rest_framework.routers import DefaultRouter
 from api.views import (
-    AssetViewSet, EmployeeAssetViewSet,
-    UpdateAssetViewSet, AddAssetViewSet, ReplaceAssetViewSet
+    AssetViewSet, EmployeeAssetViewSet, AddAssetViewSet, ReplaceAssetViewSet
 )
 
 router = DefaultRouter()
 router.register(r'api/assets', AssetViewSet, basename='assets')
 router.register(r'api/employee-assets', EmployeeAssetViewSet, basename='employee-assets')
-router.register(r'api/update-assets', UpdateAssetViewSet, basename="update-assets")
+router.register(r'api/replace-assets', ReplaceAssetViewSet, basename="update-assets")
 router.register(r'api/add-assets', AddAssetViewSet, basename='add-assets')
-router.register(r'api/replace-assets', ReplaceAssetViewSet, basename='replace-assets')
+# router.register(r'api/replace-assets', ReplaceAssetViewSet, basename='replace-assets')
 
 
 urlpatterns = [

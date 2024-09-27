@@ -1,0 +1,9 @@
+POST http://localhost:8000/replace-assets/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI3NDQ0MTY0LCJpYXQiOjE3Mjc0NDMyNjQsImp0aSI6IjQwNjhhZWQzODMzOTQzYjVhYzg2ZjQ5OGM3MjgxODk0IiwidXNlcl9pZCI6NX0.J3Hor3mF6MVcVrUujPDkIZZtb5L-rNzTNkaqoAEkZR8
+Content-Type: application/json
+
+{
+  "from_asset_id": 1,
+  "to_asset_id": 2,
+  "employee_id": 1
+}
