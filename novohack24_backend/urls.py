@@ -37,6 +37,19 @@ schema_view = get_schema_view(
     public=True,
     permission_classes=(permissions.AllowAny,),
 )
+from rest_framework.routers import DefaultRouter
+from api.views import (
+    AssetViewSet, EmployeeAssetViewSet, ChangeRequestViewSet,
+    UpdateAssetViewSet, AddAssetViewSet, ReplaceAssetViewSet
+)
+
+router = DefaultRouter()
+router.register(r'assets', AssetViewSet)
+router.register(r'employee-assets', EmployeeAssetViewSet)
+router.register(r'change-requests', ChangeRequestViewSet)
+router.register(r'update-assets', UpdateAssetViewSet)
+router.register(r'add-assets', AddAssetViewSet)
+router.register(r'replace-assets', ReplaceAssetViewSet)
 
 
 urlpatterns = [
