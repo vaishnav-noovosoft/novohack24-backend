@@ -44,11 +44,11 @@ from api.views import (
 )
 
 router = DefaultRouter()
-router.register(r'assets', AssetViewSet, basename='assets')
-router.register(r'employee-assets', EmployeeAssetViewSet, basename='employee-assets')
-router.register(r'update-assets', UpdateAssetViewSet, basename="update-assets")
-router.register(r'add-assets', AddAssetViewSet, basename='add-assets')
-router.register(r'replace-assets', ReplaceAssetViewSet, basename='replace-assets')
+router.register(r'api/assets', AssetViewSet, basename='assets')
+router.register(r'api/employee-assets', EmployeeAssetViewSet, basename='employee-assets')
+router.register(r'api/update-assets', UpdateAssetViewSet, basename="update-assets")
+router.register(r'api/add-assets', AddAssetViewSet, basename='add-assets')
+router.register(r'api/replace-assets', ReplaceAssetViewSet, basename='replace-assets')
 
 
 urlpatterns = [
