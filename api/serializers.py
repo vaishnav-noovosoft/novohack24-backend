@@ -10,6 +10,8 @@ class AssetSerializer(serializers.ModelSerializer):
 
 
 class EmployeeAssetSerializer(serializers.ModelSerializer):
+    asset = AssetSerializer(read_only=True)
+
     class Meta:
         model = EmployeeAsset
         fields = ['id', 'asset', 'employee', 'from_date', 'to_date']
