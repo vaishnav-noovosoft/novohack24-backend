@@ -15,8 +15,8 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Copy project
 COPY . /app/
 
-RUN chmod +x /app/entrypoint.sh
-ENTRYPOINT ["/app/entrypoint.sh"]
+#RUN chmod +x /app/entrypoint.sh
+#ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Run the application
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "novohack24-backend.wsgi:application"]
