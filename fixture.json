@@ -199,8 +199,7 @@
     "pk": 1,
     "fields": {
       "asset": 5,
-      "change_request": 3,
-      "status": "PEN"
+      "change_request": 3
     }
   },
   {

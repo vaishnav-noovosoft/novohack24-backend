@@ -29,8 +29,8 @@ class EmployeeAsset(models.Model):
     id = models.AutoField(primary_key=True)
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     employee = models.ForeignKey(User, on_delete=models.CASCADE)
-    from_date = models.DateField()
-    to_date = models.DateField()
+    from_date = models.DateField(null=True)
+    to_date = models.DateField(null=True)
 
 
 class ChangeRequest(models.Model):
