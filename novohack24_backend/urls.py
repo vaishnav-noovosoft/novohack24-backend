@@ -39,14 +39,13 @@ schema_view = get_schema_view(
 )
 from rest_framework.routers import DefaultRouter
 from api.views import (
-    AssetViewSet, EmployeeAssetViewSet, ChangeRequestViewSet,
+    AssetViewSet, EmployeeAssetViewSet,
     UpdateAssetViewSet, AddAssetViewSet, ReplaceAssetViewSet
 )
 
 router = DefaultRouter()
 router.register(r'assets', AssetViewSet, basename='assets')
 router.register(r'employee-assets', EmployeeAssetViewSet, basename='employee-assets')
-router.register(r'change-requests', ChangeRequestViewSet, basename='change-requests')
 router.register(r'update-assets', UpdateAssetViewSet, basename="update-assets")
 router.register(r'add-assets', AddAssetViewSet, basename='add-assets')
 router.register(r'replace-assets', ReplaceAssetViewSet, basename='replace-assets')
