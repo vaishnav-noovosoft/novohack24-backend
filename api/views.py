@@ -46,6 +46,9 @@ class ChangeRequestViewSet(viewsets.ModelViewSet):
     queryset = ChangeRequest.objects.all()
     serializer_class = ChangeRequestSerializer
 
+    def create(self, request, *args, **kwargs):
+        pass
+
 
 class UpdateAssetViewSet(viewsets.ModelViewSet):
     queryset = UpdateAsset.objects.all()
