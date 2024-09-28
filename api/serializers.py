@@ -20,3 +20,14 @@ class EmployeeAssetSerializer(serializers.ModelSerializer):
 class AddAssetSerializer(serializers.Serializer):
     asset = serializers.PrimaryKeyRelatedField(queryset=Asset.objects.filter(employee_asset__isnull=True))
 
+
+class ReplaceAssetSerializer(serializers.Serializer):
+    from_asset = serializers.PrimaryKeyRelatedField(queryset=Asset.objects.filter(employee_asset__isnull=False))
+    to_asset = serializers.PrimaryKeyRelatedField(queryset=Asset.objects.filter(employee_asset__isnull=True))
+
+
+class UpdateAssetSerializer(serializers.Serializer):
+    asset = serializers.PrimaryKeyRelatedField(queryset=Asset.objects.filter(employee_asset__isnull=False))
+    meta_data = serializers.JSONField()
+    serial_no = serializers.CharField()
+

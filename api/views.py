@@ -4,7 +4,7 @@ from django_filters import rest_framework as filters
 
 from .models import Asset, EmployeeAsset, ChangeRequest, ReplaceAsset, AddAsset
 from .serializers import (
-    AssetSerializer, EmployeeAssetSerializer, AddAssetSerializer
+    AssetSerializer, EmployeeAssetSerializer, AddAssetSerializer, ReplaceAssetSerializer
 )
 
 
@@ -40,19 +40,19 @@ class EmployeeAssetViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 
 class AddAssetViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    queryset = ChangeRequest.objects.all()
+    queryset = ChangeRequest.objects.filter(type="ADD")
     serializer_class = AddAssetSerializer
 
     def create(self, request, *args, **kwargs):
         add_asset_serializer = AddAssetSerializer(data=request.data)
         add_asset_serializer.is_valid(raise_exception=True)
 
-        asset_id = request.data.get("asset")
+        asset: Asset = add_asset_serializer.validated_data.get("asset")
 
         # Create a ChangeRequest for adding an asset
         change_request_data = {
-            "user": request.user.id,
-            "asset": asset_id,
+            "user": request.user,
+            "asset": asset,
             "type": "ADD",
             "status": "PEN",
         }
@@ -60,43 +60,41 @@ class AddAssetViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
         # Create an AddAsset instance linked to the ChangeRequest
         add_asset_data = {
-            "asset": asset_id,
-            "change_request": change_request.id,
+            "asset": asset,
+            "change_request": change_request,
         }
-        add_asset = AddAsset.objects.create(data=add_asset_data)
-        add_asset.save()
+        AddAsset.objects.create(data=add_asset_data)
 
         return Response(change_request, status=status.HTTP_201_CREATED)
 
 
-# class ReplaceAssetViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
-#     queryset = ChangeRequest.objects.filter(type='REP')
-#     serializer_class = ChangeRequestSerializer
-#
-#     def create(self, request, *args, **kwargs):
-#         # Create a ChangeRequest for replacing an asset
-#         change_request_data = {
-#             'user': request.user.id,
-#             'asset': request.data.get('from_asset'),
-#             'type': 'REP',
-#             'meta_data': request.data.get('meta_data'),
-#             'status': 'PEN'  # Set initial status as Pending
-#         }
-#         change_request_serializer = self.get_serializer(data=change_request_data)
-#         change_request_serializer.is_valid(raise_exception=True)
-#         change_request = change_request_serializer.save()
-#
-#         # Create a ReplaceAsset instance linked to the ChangeRequest
-#         replace_asset_data = {
-#             'from_asset': request.data.get('from_asset'),
-#             'to_asset': request.data.get('to_asset'),
-#             'meta_data': request.data.get('meta_data'),
-#             'change_request': change_request.id,
-#             'from_date': request.data.get('from_date'),
-#             'to_date': request.data.get('to_date')
-#         }
-#         replace_asset_serializer = ReplaceAssetSerializer(data=replace_asset_data)
-#         replace_asset_serializer.is_valid(raise_exception=True)
-#         replace_asset_serializer.save()
-#
-#         return Response(change_request_serializer.data, status=status.HTTP_201_CREATED)
+class ReplaceAssetViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    queryset = ChangeRequest.objects.filter(type='REP')
+    serializer_class = ReplaceAssetSerializer
+
+    def create(self, request, *args, **kwargs):
+        replace_asset_serializer = ReplaceAssetSerializer(data=request.data)
+        replace_asset_serializer.is_valid(raise_exception=True)
+
+        from_asset: Asset = replace_asset_serializer.validated_data.get("from_asset")
+        if not from_asset.employee_asset.employee == self.request.user:
+            return Response({"error": "from_asset does not belong to you"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create a ChangeRequest for replacing an asset
+        change_request_data = {
+            "user": request.user,
+            "asset": from_asset,
+            "type": "REP",
+            "status": "PEN"  # Set initial status as Pending
+        }
+        change_request = ChangeRequest.objects.create(data=change_request_data)
+
+        # Create a ReplaceAsset instance linked to the ChangeRequest
+        replace_asset_data = {
+            "from_asset": request.data.get("from_asset"),
+            "to_asset": request.data.get("to_asset"),
+            "change_request": change_request,
+        }
+        ReplaceAsset.objects.create(data=replace_asset_data)
+
+        return Response(change_request, status=status.HTTP_201_CREATED)
