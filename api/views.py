@@ -1,26 +1,24 @@
 from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from django_filters import rest_framework as filters
-import datetime
 
-from .models import Asset, EmployeeAsset, ChangeRequest, UpdateAsset, AddAsset, ReplaceAsset
+from .models import Asset, EmployeeAsset, ChangeRequest, ReplaceAsset, AddAsset
 from .serializers import (
-    AssetSerializer, EmployeeAssetSerializer, ChangeRequestSerializer,
-    UpdateAssetSerializer, AddAssetSerializer, ReplaceAssetSerializer
+    AssetSerializer, EmployeeAssetSerializer, AddAssetSerializer
 )
 
 
 class AssetFilter(filters.FilterSet):
-    type = filters.CharFilter(lookup_expr='icontains')
-    serial_no = filters.CharFilter(lookup_expr='icontains')
-    meta_data = filters.CharFilter(field_name='meta_data', method='filter_meta_data')
+    type = filters.CharFilter(lookup_expr="icontains")
+    serial_no = filters.CharFilter(lookup_expr="icontains")
+    meta_data = filters.CharFilter(field_name="meta_data", method="filter_meta_data")
 
     def filter_meta_data(self, queryset, name, value):
         return queryset.filter(meta_data__contains=value)
 
     class Meta:
         model = Asset
-        fields = ['id', 'type', 'meta_data', 'serial_no']
+        fields = ["id", "type", "meta_data", "serial_no"]
 
 
 class AssetViewSet(viewsets.ModelViewSet):
@@ -30,75 +28,45 @@ class AssetViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.DjangoFilterBackend,)
 
 
-class EmployeeAssetViewSet(viewsets.ModelViewSet):
+class EmployeeAssetViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = EmployeeAsset.objects.all()
     serializer_class = EmployeeAssetSerializer
 
     def get_queryset(self):
+        if self.request.user.role == "admin":
+            return self.queryset.all().select_related("asset")
+
         return self.queryset.filter(employee=self.request.user).select_related("asset")
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-
-class ReplaceAssetViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    serializer_class = UpdateAssetSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            validated_data = serializer.validated_data
-            from_asset = validated_data.get("from_asset_id")
-            change_request = ChangeRequest.objects.create(
-                user = request.user,
-                asset_id = from_asset,
-                type = "ADD",
-                status = "PEN",
-            )
-            ReplaceAsset.objects.create(
-                from_asset_id=validated_data.get("from_asset_id"),
-                to_asset_id = validated_data.get("to_asset_id"),
-                change_request = change_request,
-                from_date = datetime.datetime.now(),
-                to_date = datetime.datetime.now() + datetime.timedelta(days=10)
-               )
-
-            return Response(validated_data, status=status.HTTP_201_CREATED)
-
-        else:
-            return Response(serializer.errors)
-
 
 
 class AddAssetViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    queryset = ChangeRequest.objects.filter(type='ADD')
-    serializer_class = ChangeRequestSerializer
+    queryset = ChangeRequest.objects.all()
+    serializer_class = AddAssetSerializer
 
     def create(self, request, *args, **kwargs):
+        add_asset_serializer = AddAssetSerializer(data=request.data)
+        add_asset_serializer.is_valid(raise_exception=True)
+
+        asset_id = request.data.get("asset")
+
         # Create a ChangeRequest for adding an asset
         change_request_data = {
-            'user': request.user.id,
-            'asset': request.data.get('asset'),
-            'type': 'ADD',
-            'meta_data': request.data.get('meta_data'),
-            'status': 'PEN'  # Set initial status as Pending
+            "user": request.user.id,
+            "asset": asset_id,
+            "type": "ADD",
+            "status": "PEN",
         }
-        change_request_serializer = self.get_serializer(data=change_request_data)
-        change_request_serializer.is_valid(raise_exception=True)
-        change_request = change_request_serializer.save()
+        change_request = ChangeRequest.objects.create(data=change_request_data)
 
         # Create an AddAsset instance linked to the ChangeRequest
         add_asset_data = {
-            'asset': request.data.get('asset'),
-            'change_request': change_request.id,
+            "asset": asset_id,
+            "change_request": change_request.id,
         }
-        add_asset_serializer = AddAssetSerializer(data=add_asset_data)
-        add_asset_serializer.is_valid(raise_exception=True)
-        add_asset_serializer.save()
+        add_asset = AddAsset.objects.create(data=add_asset_data)
+        add_asset.save()
 
-        return Response(change_request_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(change_request, status=status.HTTP_201_CREATED)
 
 
 # class ReplaceAssetViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):

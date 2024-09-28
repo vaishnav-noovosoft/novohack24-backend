@@ -43,7 +43,7 @@ def handle_add_asset(change_request: ChangeRequest):
         raise ValidationError("Cannot add an asset that is already assigned to an employee.")
 
     # Update the status of AddAsset to 'Completed'
-    EmployeeAsset.objects.create(asset=asset, employee=change_request.user, from_date=None, to_date=None)
+    EmployeeAsset.objects.create(asset=asset, employee=change_request.user)
 
 
 def handle_replace_asset(change_request: ChangeRequest):
