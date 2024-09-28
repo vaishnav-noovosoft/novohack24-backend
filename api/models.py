@@ -26,12 +26,12 @@ class Asset(models.Model):
     serial_no = models.CharField(unique=True)
 
     # related names
-    employee_asset: QuerySet["EmployeeAsset"]
+    employee_asset: "EmployeeAsset"
 
 
 class EmployeeAsset(models.Model):
     id = models.AutoField(primary_key=True)
-    asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name="employee_asset")
+    asset = models.OneToOneField(Asset, on_delete=models.CASCADE, related_name="employee_asset")
     employee = models.ForeignKey(User, on_delete=models.CASCADE)
     from_date = models.DateField(null=True)
     to_date = models.DateField(null=True)
