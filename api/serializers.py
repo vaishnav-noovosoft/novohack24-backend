@@ -29,5 +29,5 @@ class ReplaceAssetSerializer(serializers.Serializer):
 class UpdateAssetSerializer(serializers.Serializer):
     asset = serializers.PrimaryKeyRelatedField(queryset=Asset.objects.filter(employee_asset__isnull=False))
     meta_data = serializers.JSONField()
-    serial_no = serializers.CharField()
+
 

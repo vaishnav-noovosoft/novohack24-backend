@@ -2,9 +2,9 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from django_filters import rest_framework as filters
 
-from .models import Asset, EmployeeAsset, ChangeRequest, ReplaceAsset, AddAsset
+from .models import Asset, EmployeeAsset, ChangeRequest, ReplaceAsset, AddAsset, UpdateAsset
 from .serializers import (
-    AssetSerializer, EmployeeAssetSerializer, AddAssetSerializer, ReplaceAssetSerializer
+    AssetSerializer, EmployeeAssetSerializer, AddAssetSerializer, ReplaceAssetSerializer, UpdateAssetSerializer
 )
 
 
@@ -52,7 +52,6 @@ class AddAssetViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         # Create a ChangeRequest for adding an asset
         change_request_data = {
             "user": request.user,
-            "asset": asset,
             "type": "ADD",
             "status": "PEN",
         }
@@ -83,7 +82,6 @@ class ReplaceAssetViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
         # Create a ChangeRequest for replacing an asset
         change_request_data = {
             "user": request.user,
-            "asset": from_asset,
             "type": "REP",
             "status": "PEN"  # Set initial status as Pending
         }
@@ -96,5 +94,31 @@ class ReplaceAssetViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
             "change_request": change_request,
         }
         ReplaceAsset.objects.create(data=replace_asset_data)
+
+        return Response(change_request, status=status.HTTP_201_CREATED)
+
+
+class UpdateAssetViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    queryset = ChangeRequest.objects.filter(type="UPD")
+    serializer_class = UpdateAssetSerializer
+
+    def update(self, request, *args, **kwargs):
+        update_asset_serializer = UpdateAssetSerializer(data=request.data)
+        update_asset_serializer.is_valid(raise_exception=True)
+
+        asset = update_asset_serializer.validated_data.get("asset")
+        change_request_data = {
+            "user": request.user,
+            type: "UPD",
+            status: "PEN",
+        }
+        change_request = ChangeRequest.objects.create(data=change_request_data)
+
+        update_asset_data = {
+            "asset": request.data.get("asset"),
+            "change_request": change_request,
+            "meta_data": update_asset_serializer.validated_data.get("meta_data"),
+        }
+        UpdateAsset.objects.create(data=update_asset_data)
 
         return Response(change_request, status=status.HTTP_201_CREATED)

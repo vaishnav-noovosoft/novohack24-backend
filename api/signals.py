@@ -52,17 +52,16 @@ def handle_replace_asset(change_request: ChangeRequest):
     to_asset = replace_asset.to_asset
 
     # Check if the 'from_asset' is assigned to an employee
-    employee_asset = EmployeeAsset.objects.filter(asset=from_asset, employee=change_request.user).first()
+    employee_asset: EmployeeAsset = EmployeeAsset.objects.filter(asset=from_asset, employee=change_request.user).first()
     if not employee_asset:
-        raise ValidationError("The asset to be replaced is not currently assigned to you.")
+        raise ValidationError("The asset to be replaced is not currently assigned to request employee.")
 
     # Check if the 'to_asset' is already assigned to an employee
     if EmployeeAsset.objects.filter(asset=to_asset).exists():
         raise ValidationError("The new asset is already assigned to an employee.")
 
     # Update the existing EmployeeAsset record
-    employee_asset.to_date = replace_asset.from_date
-    employee_asset.save()
+    employee_asset.delete()
 
     # Create a new EmployeeAsset record for the new asset
     EmployeeAsset.objects.create(
@@ -72,6 +71,3 @@ def handle_replace_asset(change_request: ChangeRequest):
         to_date=replace_asset.to_date
     )
 
-    # Update the meta_data of the new asset
-    to_asset.meta_data = replace_asset.meta_data
-    to_asset.save()
