@@ -51,9 +51,7 @@ class ChangeRequest(models.Model):
 
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     type = models.CharField(max_length=3, choices=TYPE_CHOICES)
-    meta_data = models.JSONField(null=True, blank=True)
     status = models.CharField(max_length=3, choices=STATUS_CHOICES, default="PEN")
 
 
