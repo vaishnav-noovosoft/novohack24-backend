@@ -26,7 +26,7 @@ from django.urls import path, re_path
 
 from rest_framework.routers import DefaultRouter
 from api.views import (
-    AssetViewSet, EmployeeAssetViewSet, AddAssetViewSet
+    AssetViewSet, EmployeeAssetViewSet, AddAssetViewSet, ReplaceAssetViewSet, UpdateAssetViewSet
 )
 
 schema_view = get_schema_view(
@@ -42,9 +42,9 @@ schema_view = get_schema_view(
 router = DefaultRouter()
 router.register(r'api/assets', AssetViewSet, basename='assets')
 router.register(r'api/employee-assets', EmployeeAssetViewSet, basename='employee-assets')
-# router.register(r'api/replace-assets', ReplaceAssetViewSet, basename="update-assets")
 router.register(r'api/add-assets', AddAssetViewSet, basename='add-assets')
-# router.register(r'api/replace-assets', ReplaceAssetViewSet, basename='replace-assets')
+router.register(r'api/replace-assets', ReplaceAssetViewSet, basename='replace-assets')
+router.register(r'api/update-assets', UpdateAssetViewSet, basename='update-assets')
 
 
 urlpatterns = [

@@ -4,7 +4,7 @@ from django_filters import rest_framework as filters
 
 from .models import Asset, EmployeeAsset, ChangeRequest, ReplaceAsset, AddAsset, UpdateAsset
 from .serializers import (
-    AssetSerializer, EmployeeAssetSerializer, AddAssetSerializer, ReplaceAssetSerializer, UpdateAssetSerializer
+    AssetSerializer, EmployeeAssetSerializer, AddAssetSerializer, ReplaceAssetSerializer, UpdateAssetSerializer,
 )
 
 
@@ -21,7 +21,7 @@ class AssetFilter(filters.FilterSet):
         fields = ["id", "type", "meta_data", "serial_no"]
 
 
-class AssetViewSet(viewsets.ModelViewSet):
+class AssetViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Asset.objects.all()
     serializer_class = AssetSerializer
     filterset_class = AssetFilter
@@ -55,16 +55,16 @@ class AddAssetViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
             "type": "ADD",
             "status": "PEN",
         }
-        change_request = ChangeRequest.objects.create(data=change_request_data)
+        change_request = ChangeRequest.objects.create(**change_request_data)
 
         # Create an AddAsset instance linked to the ChangeRequest
         add_asset_data = {
             "asset": asset,
             "change_request": change_request,
         }
-        AddAsset.objects.create(data=add_asset_data)
+        add_asset = AddAsset.objects.create(**add_asset_data)
 
-        return Response(change_request, status=status.HTTP_201_CREATED)
+        return Response(add_asset, status=status.HTTP_201_CREATED)
 
 
 class ReplaceAssetViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -85,7 +85,7 @@ class ReplaceAssetViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
             "type": "REP",
             "status": "PEN"  # Set initial status as Pending
         }
-        change_request = ChangeRequest.objects.create(data=change_request_data)
+        change_request = ChangeRequest.objects.create(**change_request_data)
 
         # Create a ReplaceAsset instance linked to the ChangeRequest
         replace_asset_data = {
@@ -93,9 +93,9 @@ class ReplaceAssetViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
             "to_asset": request.data.get("to_asset"),
             "change_request": change_request,
         }
-        ReplaceAsset.objects.create(data=replace_asset_data)
+        replace_asset = ReplaceAsset.objects.create(**replace_asset_data)
 
-        return Response(change_request, status=status.HTTP_201_CREATED)
+        return Response(replace_asset, status=status.HTTP_201_CREATED)
 
 
 class UpdateAssetViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
@@ -106,19 +106,18 @@ class UpdateAssetViewSet(mixins.UpdateModelMixin, viewsets.GenericViewSet):
         update_asset_serializer = UpdateAssetSerializer(data=request.data)
         update_asset_serializer.is_valid(raise_exception=True)
 
-        asset = update_asset_serializer.validated_data.get("asset")
         change_request_data = {
             "user": request.user,
             type: "UPD",
             status: "PEN",
         }
-        change_request = ChangeRequest.objects.create(data=change_request_data)
+        change_request = ChangeRequest.objects.create(**change_request_data)
 
         update_asset_data = {
-            "asset": request.data.get("asset"),
+            "asset": update_asset_serializer.validated_data.get("asset"),
             "change_request": change_request,
             "meta_data": update_asset_serializer.validated_data.get("meta_data"),
         }
-        UpdateAsset.objects.create(data=update_asset_data)
+        UpdateAsset.objects.create(**update_asset_data)
 
         return Response(change_request, status=status.HTTP_201_CREATED)
